@@ -14,9 +14,12 @@ require('@tensorflow/tfjs-node')
 
 // Train a simple model:
 const model = tf.sequential()
-model.add(tf.layers.dense({units: 24, activation: 'relu', inputShape: [config.input_size]}))
+model.add(tf.layers.dense({units: 64, activation: 'relu', inputShape: [config.input_size]}))
+model.add(tf.layers.dropout(0.5))
+model.add(tf.layers.dense({units: 64, activation: 'relu'}))
+model.add(tf.layers.dropout(0.5))
 model.add(tf.layers.dense({units: config.output_size, activation: 'linear'}))
-model.compile({optimizer: 'sgd', loss: 'meanSquaredError'})
+model.compile({optimizer: 'adamax', loss: 'meanSquaredError'})
 
 const batch_size = config.batch_size;
 
@@ -124,13 +127,13 @@ async function runEpochTrainAndVisual(batches) {
 }
 
 let epoch = 0
-let totalEpochs = 50
+let totalEpochs = 200
 async function runTraining(batches) {
   while (epoch < totalEpochs) {
     await runEpochTrainAndVisual(batches)
     epoch++
   }
-  await model.save('file://model/')
+  await model.save('file://model/test-model' + new Date().getTime() + '.json')
   predict()
 }
 
