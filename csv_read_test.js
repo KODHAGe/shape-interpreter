@@ -41,17 +41,18 @@ csv().fromFile(csvFilePath).then((json) => {
     })
     data.push({x: x, y: y})
   })
+  console.log(data)
   tf.util.shuffle(data)
 
   const batches = []
   let index = 0
-  let batchSize = batch_size
+  let batch_size = batch_size
   while (index < data.length) {
     if (data.length - index < batch_size) {
-      batchSize = data.length - index
+      batch_size = data.length - index
     }
 
-    const dataBatch = data.slice(index, index + batchSize);
+    const dataBatch = data.slice(index, index + batch_size);
     const xShape = [dataBatch.length, config.input_size]
     const yShape = [dataBatch.length, config.output_size]
     const xData = new Float32Array(tf.util.sizeFromShape(xShape))
@@ -87,7 +88,7 @@ csv().fromFile(csvFilePath).then((json) => {
       y: tf.tensor2d(yData, yShape)
     });
 
-    index += batchSize
+    index += batch_size
   }
   runTraining(batches)
 })
@@ -101,7 +102,7 @@ async function trainBatch(index, batches) {
     epochs: 1,
     shuffle: false,
     validationData: [batches[index].x, batches[index].y],
-    batchSize: batch_size
+    batch_size: batch_size
   });
 
   step++;

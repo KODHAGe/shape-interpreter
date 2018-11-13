@@ -1,6 +1,7 @@
 {
   "dependencies": {
-    "@tensorflow/tfjs-node": "^0.1.17",
+    "@google-cloud/firestore": "^0.18.0",
+    "@tensorflow/tfjs-node": "^0.1.20",
     "csvtojson": "^2.0.8"
   }
 }
