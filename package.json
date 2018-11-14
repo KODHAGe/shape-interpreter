@@ -1,7 +1,16 @@
 {
+  "scripts": {
+    "start": "micro",
+    "dev": "micro-dev --port 3666 --ignore model/"
+  },
   "dependencies": {
     "@google-cloud/firestore": "^0.18.0",
     "@tensorflow/tfjs-node": "^0.1.20",
-    "csvtojson": "^2.0.8"
+    "csvtojson": "^2.0.8",
+    "micro": "^9.3.3"
+  },
+  "devDependencies": {
+    "micro-dev": "^3.0.0",
+    "prettier": "1.15.2"
   }
 }
