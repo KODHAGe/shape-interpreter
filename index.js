@@ -1,13 +1,16 @@
+// Service/server
 const { send } = require('micro')
-const { router, get } = require('microrouter')
+const { router, get, post } = require('microrouter')
 
+// File handling
 const { promisify } = require('util')
 const fs = require('fs')
 const readdir = promisify(fs.readdir)
 
+// Tensorflow
 const tf = require('@tensorflow/tfjs')
 require('@tensorflow/tfjs-node')
-const modeler = require('./modeler.js')
+const modeler = require('./lib/modeler.js')
 
 async function get_latest_model() {
   try {
@@ -20,13 +23,19 @@ async function get_latest_model() {
   }
 }
 
-const get_model = async (req, res) => {
+async function update_model(req, res) {
+  modeler.update()
+  let latest = get_latest_model()
+  send(res, 200, 'Training the model. This will take some time. Current version is '+ latest + '.')
+}
+
+async function get_model(req, res) {
   let latest = await get_latest_model()
   const model = await tf.loadModel('file://model/' + latest + '/model.json')
   send(res, 200, model)
 }
 
-const make_prediction = async (req, res) => {
+async function make_prediction (req, res) {
   // default to zeroes
   let array = [0,0,0,0,0,0,0,0,0]
   if(req.params.array) {
@@ -42,13 +51,16 @@ const make_prediction = async (req, res) => {
   for (let i = 0; i < order.length; i++) {
     predictionResultObject[order[i]] = values[i]
   }
+  predictionResultObject['modelVersion'] = latest
   send(res, 200, predictionResultObject)
 }
 
 module.exports = router(
   get('/', (req, res) => {
-    send(res, 200, 'uh-huh')
+    send(res, 200, 'Shape interpreter API v1')
   }),
+  get('/updateModel', update_model),
   get('/getModel', get_model),
-  get('/makePrediction/:array', make_prediction)
+  get('/makePrediction/:array', make_prediction),
+  post('/makePrediction', make_prediction)
 )
