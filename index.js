@@ -9,7 +9,21 @@ const config = {
       keyFilename: 'credentials.json',
       timestampsInSnapshots: true
     },
-    collection: 'results'
+    collection: 'results',
+    sort_order: [ 
+      'sliderValueRotZ',
+      'sliderValueRotX',
+      'sliderValueRotY',
+      'sliderValueWidth',
+      'sliderValueLength',
+      'sliderValueHeight',
+      'sliderValueScale',
+      'sliderValueRadius',
+      'sliderValueHue',
+      'sliderValueLightness',
+      'sliderValueOpacity',
+      'sliderValueMatte',
+    ]
   },
   tensorflow : {
     batch_size: 5,
@@ -42,12 +56,7 @@ var query = results.get()
     snapshot.forEach(doc => {
       let data = handleData(doc)
       if(data) {
-        dataset.push(
-          {
-            x: data.x,
-            y: data.y
-          }
-        )
+        dataset.push(data)
       }
     })
     console.log(dataset)
@@ -111,19 +120,27 @@ function trainModel(data) {
 
 function handleData(data) {
   let rawData = data.data()
+  
   // Only return completed stuff
   if(rawData.completed) {
+    
     // Make it flat
     let inputData = config.tensorflow.emotion_defaults
-    let outputData = rawData.data
+
+    // Make sure the output data is in required order
+    outputData = []
+    for (let key of config.firestore.sort_order) {
+      outputData.push(rawData.data[key])
+    }
+
     // Set value for selected emotion
     inputData[rawData.title.toLowerCase()] = 1
+
     outputObject = {
-      x_headers: Object.keys(inputData),
-      y_headers: Object.keys(outputData),
       x: Object.values(inputData),
       y: Object.values(outputData)
     }
+    
     return outputObject
   } else {
     return false
@@ -154,7 +171,7 @@ async function trainBatch(index, batches) {
   });
 
   step++;
-  console.log('iteration: ',step)
+  console.log('iteration: ', step)
   let loss = history.history.loss[0]
   losshistory.push(loss)
   let avg = (losshistory.reduce(function(a, b) { return a + b; }, 0))/losshistory.length;
@@ -176,7 +193,7 @@ async function runEpochTrainAndVisual(batches) {
 }
 
 let epoch = 0
-let totalEpochs = 500
+let totalEpochs = 1000
 async function runTraining(batches) {
   while (epoch < totalEpochs) {
     await runEpochTrainAndVisual(batches)
@@ -187,10 +204,11 @@ async function runTraining(batches) {
 }
 
 function predict() {
-  const predictions = model.predictOnBatch(tf.ones([1, config.tensorflow.input_size]))
-  predictions.print()
-  const predictions2 = model.predictOnBatch(tf.zeros([1, config.tensorflow.input_size]))
-  predictions2.print()
-  const predictionsAnger = model.predictOnBatch(tf.oneHot(tf.tensor1d([0, 1], 'int32'), config.tensorflow.input_size))
-  predictionsAnger.print()
+  console.log(config.firestore.sort_order)
+  const predictionOnes = model.predictOnBatch(tf.ones([1, config.tensorflow.input_size]))
+  //predictionOnes.print()
+  const predictionZeros = model.predictOnBatch(tf.zeros([1, config.tensorflow.input_size]))
+  //predictionZeros.print()
+  const predictionAnger = model.predictOnBatch(tf.tensor2d([1,0,0,0,0,0,0,0,0], [1,9]))
+  predictionAnger.print()
 }
