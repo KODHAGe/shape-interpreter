@@ -1,0 +1,35 @@
+<html>
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/p5.js"></script>
+    <script>
+      function setup() {
+        createCanvas(windowWidth, windowHeight, 'webgl')
+        setAttributes('antialias', true)
+      }
+
+      function draw() {
+        colorMode(HSB)
+        background(100)
+        noStroke()
+        ambientLight(0,0,100)
+        pointLight(55, 255, 255, 250, 500, 100)
+
+        if(Math.floor(<%= sliderValueMatte %>) === 0) {
+          ambientMaterial(<%= sliderValueHue %>, 65, <%= sliderValueLightness %>, <%= sliderValueOpacity %>/100)
+        } else {
+          specularMaterial(<%= sliderValueHue %> , 65, <%= sliderValueLightness %>, <%= sliderValueOpacity %>/100)
+        }
+
+        rotateY(radians(<%= sliderValueRotY %>))
+        rotateX(radians(<%= sliderValueRotX %>))
+        rotateZ(radians(<%= sliderValueRotZ %>))
+        box(<%= sliderValueWidth %>, <%= sliderValueHeight %>, <%= sliderValueLength %> )
+      }
+    </script>
+  </head>
+  <body>
+    <h5 style="position:fixed; top: 0px; left: 16px;"><%= title %></h5>
+    <h5 style="position:fixed; top: 18px; left: 16px;">v: <%= model %></h5>
+    <h5 style="position:fixed; top: 36px; left: 16px;">i: <%= iteration %></h5>
+  </body>
+</html>
