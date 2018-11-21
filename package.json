@@ -1,8 +1,9 @@
 {
   "scripts": {
-    "start": "micro --port 3666",
+    "start": "micro",
     "dev": "micro-dev --port 3666 --ignore model/",
-    "serve": "pm2 start micro --port 3666"
+    "kill": "pm2 delete shape-interpreter",
+    "serve": "pm2 start npm --name shape-interpreter -- start"
   },
   "dependencies": {
     "@google-cloud/firestore": "^0.18.0",
