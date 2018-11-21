@@ -3,7 +3,7 @@ const jwt = require('jwt-simple')
 const secret = process.env.JWT_SECRET
 
 // Service/server
-const { send } = require('micro')
+const { send, json } = require('micro')
 const { router, get, post } = require('microrouter')
 
 // File handling
@@ -62,10 +62,14 @@ async function get_model(req, res) {
 async function make_prediction (req, res) {
   await authenticate(req, res, async() => {
     // default to zeroes
-    let array = [0,0,0,0,0,0,0,0,0]
-    if(req.params.array) {
-      array = JSON.parse(req.params.array)
-      console.log(typeof(JSON.parse(req.params.array)))
+    let array;
+    let body = await json(req)
+    if(!body.array) {
+      array = [0,0,0,0,0,0,0,0,0]
+    } else if (body.array.length != 9) {
+      send(res, 500, 'Array of invalid size.')
+    } else {
+      array = body.array
     }
     let latest = await get_latest_model()
     const model = await tf.loadModel('file://model/' + latest + '/model.json')
@@ -85,8 +89,7 @@ module.exports = router(
   get('/', (req, res) => {
     send(res, 200, 'Shape interpreter API v1')
   }),
-  get('/updateModel', update_model),
-  get('/getModel', get_model),
-  get('/makePrediction/:array', make_prediction),
+  post('/updateModel', update_model),
+  post('/getModel', get_model),
   post('/makePrediction', make_prediction)
 )
