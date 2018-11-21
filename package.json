@@ -1,7 +1,8 @@
 {
   "scripts": {
     "start": "micro",
-    "dev": "micro-dev --port 3666 --ignore model/"
+    "dev": "micro-dev --port 3666 --ignore model/",
+    "serve": "nodemon micro --port 3666"
   },
   "dependencies": {
     "@google-cloud/firestore": "^0.18.0",
