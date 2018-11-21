@@ -5,6 +5,7 @@ const secret = process.env.JWT_SECRET
 // Service/server
 const { send, json } = require('micro')
 const { router, get, post } = require('microrouter')
+const handler = require('serve-handler');
 
 // File handling
 const { promisify } = require('util')
@@ -85,10 +86,19 @@ async function make_prediction (req, res) {
   })
 }
 
+async function handle (req, res) {
+  return handler(req, res, {
+    "rewrites": [
+      { "source": "./index", "destination": "/snapshot/output" },
+    ]
+  })
+}
+
 module.exports = router(
   get('/', (req, res) => {
     send(res, 200, 'Shape interpreter API v1')
   }),
+  get('*', handle),
   post('/updateModel', update_model),
   post('/getModel', get_model),
   post('/makePrediction', make_prediction)

@@ -3,3 +3,4 @@ model
 node_modules
 credentials.json
 .env
+snapshot/output
