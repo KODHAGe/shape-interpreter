@@ -11,7 +11,7 @@ let puppet = async function(str, data) {
     const page = await browser.newPage()
     await page.setViewport({ width: 300, height: 300 })
     await page.goto(`data:text/html,${str}`, { waituntil: 'networkidle2'})
-    let filename = new Date().toISOString() + '-example.png'
+    let filename = new Date().toISOString() + '-'+ data.title +'.png'
     await page.screenshot({path: path.join(__dirname, 'output/', data.model, '/', filename)})
     await browser.close()
   })

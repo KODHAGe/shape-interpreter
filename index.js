@@ -24,6 +24,7 @@ async function get_latest_model() {
   }
   finally {
     let latest = files[files.length - 1]
+    console.log(latest)
     return latest
   }
 }
