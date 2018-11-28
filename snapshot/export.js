@@ -10,7 +10,8 @@ let puppet = async function(str, data) {
     const browser = await puppeteer.launch()
     const page = await browser.newPage()
     await page.setViewport({ width: 300, height: 300 })
-    await page.goto(`data:text/html,${str}`, { waituntil: 'networkidle2'})
+    await page.goto(`data:text/html,${str}`)
+    await timeout(5000)
     let filename = new Date().toISOString() + '-'+ data.title +'.png'
     await page.screenshot({path: path.join(__dirname, 'output/', data.model, '/', filename)})
     await browser.close()
@@ -20,6 +21,8 @@ let puppet = async function(str, data) {
 let render = async function (data) {
   await ejs.renderFile(path.join(__dirname, 'p5sketch.ejs'), data, async function(err, str){
     if (err) throw 'error' + err
+    let filename = new Date().toISOString() + '-'+ data.title
+    fs.writeFileSync('./test'+filename+'.html', str, 'utf8');
     await puppet(str, data)
   })
 }
@@ -28,6 +31,10 @@ let takesnap = async function(data) {
   if(data) {
     await render(data)
   }
+}
+
+async function timeout(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 module.exports = {
