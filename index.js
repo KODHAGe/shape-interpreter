@@ -1,10 +1,11 @@
 require('dotenv').config()
+const path = require('path')
 const jwt = require('jwt-simple')
 const secret = process.env.JWT_SECRET
 
 // Service/server
 const { send, json } = require('micro')
-const { router, get, post } = require('microrouter')
+const { router, get, post, options } = require('microrouter')
 const handler = require('serve-handler');
 
 // File handling
@@ -20,9 +21,16 @@ const modeler = require('./lib/modeler.js')
 async function get_latest_model() {
   try {
     files = await readdir('model/')
-    files.splice(files.indexOf('.DS_Store'), 1);
   }
   finally {
+    files.sort(function(a, b) {
+      a = path.join(__dirname, '/model/', a)
+      a = fs.statSync(a).ctime
+      b = path.join(__dirname, '/model/', b)
+      b = fs.statSync(b).ctime
+      return a - b
+    })
+    files.splice(files.indexOf('.DS_Store'), 1);
     let latest = files[files.length - 1]
     console.log(latest)
     return latest
@@ -78,6 +86,8 @@ async function make_prediction (req, res) {
     let prediction = await model.predictOnBatch(tf.tensor2d(array, [1,9]))
     let values = prediction.dataSync()
     let order = modeler.config.firestore.sort_order
+    console.log(order)
+    console.log(values)
     let predictionResultObject = {}
     for (let i = 0; i < order.length; i++) {
       predictionResultObject[order[i]] = values[i]
@@ -85,6 +95,15 @@ async function make_prediction (req, res) {
     predictionResultObject['modelVersion'] = latest
     send(res, 200, predictionResultObject)
   })
+}
+
+async function handle_preflight (req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+  res.setHeader('Access-Control-Allow-Credentials', false)
+  res.setHeader('Access-Control-Max-Age', '86400')
+  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept')
+  send(res, 200)
 }
 
 async function handle (req, res) {
@@ -100,6 +119,7 @@ module.exports = router(
     send(res, 200, 'Shape interpreter API v1')
   }),
   get('*', handle),
+  options('*', handle_preflight),
   post('/updateModel', update_model),
   post('/getModel', get_model),
   post('/makePrediction', make_prediction)

@@ -21,8 +21,8 @@ let puppet = async function(str, data) {
 let render = async function (data) {
   await ejs.renderFile(path.join(__dirname, 'p5sketch.ejs'), data, async function(err, str){
     if (err) throw 'error' + err
-    let filename = new Date().toISOString() + '-'+ data.title
-    fs.writeFileSync('./test'+filename+'.html', str, 'utf8');
+    /*let filename = new Date().toISOString() + '-'+ data.title
+    fs.writeFileSync('./test'+filename+'.html', str, 'utf8');*/
     await puppet(str, data)
   })
 }
