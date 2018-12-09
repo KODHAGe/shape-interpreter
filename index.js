@@ -86,11 +86,13 @@ async function make_prediction (req, res) {
     let prediction = await model.predictOnBatch(tf.tensor2d(array, [1,9]))
     let values = prediction.dataSync()
     let order = modeler.config.firestore.sort_order
-    console.log(order)
-    console.log(values)
-    let predictionResultObject = {}
+    let predictionResultObject = {'shapes': {}}
     for (let i = 0; i < order.length; i++) {
-      predictionResultObject[order[i]] = values[i]
+      if(i < 12) {
+        predictionResultObject[order[i]] = values[i]
+      } else { //for shapes
+        predictionResultObject['shapes'][order[i]] = values[i] 
+      }
     }
     predictionResultObject['modelVersion'] = latest
     send(res, 200, predictionResultObject)
