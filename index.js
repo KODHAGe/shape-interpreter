@@ -12,11 +12,13 @@ const handler = require('serve-handler');
 const { promisify } = require('util')
 const fs = require('fs')
 const readdir = promisify(fs.readdir)
+const readFile = promisify(fs.readFile)
 
 // Tensorflow
 const tf = require('@tensorflow/tfjs')
 require('@tensorflow/tfjs-node')
 const modeler = require('./lib/modeler.js')
+
 
 async function get_latest_model() {
   try {
@@ -117,8 +119,9 @@ async function handle (req, res) {
 }
 
 module.exports = router(
-  get('/', (req, res) => {
-    send(res, 200, 'Shape interpreter API v1')
+  get('/', async (req, res) => {
+    let version = await readFile('version.tag')
+    send(res, 200, 'Shape interpreter API v1, model v' + version)
   }),
   get('*', handle),
   options('*', handle_preflight),

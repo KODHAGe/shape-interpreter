@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "start": "micro",
+    "start": "micro --port 3666",
     "dev": "micro-dev --port 3666 --ignore snapshot/output/",
     "kill": "pm2 delete shape-interpreter",
     "serve": "pm2 start npm --name shape-interpreter -- start"

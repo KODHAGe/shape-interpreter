@@ -2,18 +2,21 @@ const ejs = require('ejs')
 const puppeteer = require('puppeteer')
 const path = require('path')
 const fs = require('fs')
+const { promisify } = require('util')
+const readFile = promisify(fs.readFile)
 
 let puppet = async function(str, data) {
-  await fs.mkdir(path.join(__dirname, 'output/', data.model, '/'), async (err) => {
+  let version = await readFile('./version.tag')
+  await fs.mkdir(path.join(__dirname, 'output/', data.model + '-' + version, '/'), async (err) => {
     if (err && err.code != 'EEXIST') throw 'error'
 
     const browser = await puppeteer.launch()
     const page = await browser.newPage()
     await page.setViewport({ width: 300, height: 300 })
     await page.goto(`data:text/html,${str}`)
-    await timeout(5000)
+    await timeout(5000) // 5 sec timeout to make sure page is rendered
     let filename = new Date().toISOString() + '-'+ data.title +'.png'
-    await page.screenshot({path: path.join(__dirname, 'output/', data.model, '/', filename)})
+    await page.screenshot({path: path.join(__dirname, 'output/', data.model + '-' + version, '/', filename)})
     await browser.close()
   })
 };
