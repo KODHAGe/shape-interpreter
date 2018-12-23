@@ -3,7 +3,9 @@
     "start": "micro",
     "dev": "micro-dev --port 3666 --ignore snapshot/output/",
     "kill": "pm2 delete shape-interpreter",
-    "serve": "pm2 start npm --name shape-interpreter -- start"
+    "serve": "pm2 start npm --name shape-interpreter -- start",
+    "localremote": "tunnel.now shape-interpreter.now.sh 3000",
+    "localremotedeploy": "tunnel.deploy shape-interpreter.now.sh"
   },
   "dependencies": {
     "@google-cloud/firestore": "^0.18.0",
@@ -16,7 +18,8 @@
     "micro": "^9.3.3",
     "microrouter": "^3.1.3",
     "puppeteer": "^1.10.0",
-    "serve": "^10.1.1"
+    "serve": "^10.1.1",
+    "tunnel.now": "https://github.com/mahmoudimus/tunnel.now.git"
   },
   "devDependencies": {
     "micro-dev": "^3.0.0",
