@@ -14,13 +14,25 @@ const fs = require('fs')
 const readdir = promisify(fs.readdir)
 const readFile = promisify(fs.readFile)
 
+const storage = require('./lib/storage.js')
+
 // Tensorflow
 const tf = require('@tensorflow/tfjs')
 require('@tensorflow/tfjs-node')
 const modeler = require('./lib/modeler.js')
 
+// Config
+const config = require('./lib/config.js')
 
 async function get_latest_model() {
+
+  // Downloads
+  await storage.download('version.tag')
+  let version = await readFile('./version.tag')
+  await storage.download('model/' + config.tensorflow.model_name + '-' + (version - 1) + '/model.json', 'model/' + config.tensorflow.model_name + '-' + (version - 1) + '/')
+  await storage.download('model/' + config.tensorflow.model_name + '-' + (version - 1) + '/weights.bin')
+
+  // Reads
   try {
     files = await readdir('model/')
   }
@@ -83,6 +95,7 @@ async function make_prediction (req, res) {
     } else {
       array = body.array
     }
+
     let latest = await get_latest_model()
     const model = await tf.loadModel('file://model/' + latest + '/model.json')
     let prediction = await model.predictOnBatch(tf.tensor2d(array, [1,9]))
@@ -118,6 +131,15 @@ async function handle (req, res) {
   })
 }
 
+async function do_upload(req, res) {
+  console.log('Do manual upload')
+  storage.upload('version.tag')
+  let version = await readFile('version.tag')
+  storage.upload('model/' + config.tensorflow.model_name + '-' + (version - 1)+ '/model.json')
+  storage.upload('model/' + config.tensorflow.model_name + '-' + (version - 1)+ '/weights.bin')
+  send(res, 200)
+}
+
 module.exports = router(
   get('/', async (req, res) => {
     let version = await readFile('version.tag')
@@ -125,6 +147,7 @@ module.exports = router(
   }),
   get('*', handle),
   options('*', handle_preflight),
+  post('/manualUpload', do_upload),
   post('/updateModel', update_model),
   post('/getModel', get_model),
   post('/makePrediction', make_prediction)

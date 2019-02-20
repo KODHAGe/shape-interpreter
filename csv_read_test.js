@@ -19,7 +19,7 @@ model.add(tf.layers.dropout(0.5))
 model.add(tf.layers.dense({units: 64, activation: 'relu'}))
 model.add(tf.layers.dropout(0.5))
 model.add(tf.layers.dense({units: config.output_size, activation: 'linear'}))
-model.compile({optimizer: 'adamax', loss: 'meanSquaredError'})
+model.compile({optimizer: tf.train.adam(0.01), loss: 'categoricalCrossentropy'})
 
 const batch_size = config.batch_size;
 
