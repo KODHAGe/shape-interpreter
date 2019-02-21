@@ -9,6 +9,7 @@
   "dependencies": {
     "@google-cloud/firestore": "^0.18.0",
     "@google-cloud/storage": "^2.4.2",
+    "@tensorflow/tfjs-node": "^0.1.20",
     "csvtojson": "^2.0.8",
     "dotenv": "^6.1.0",
     "ejs": "^2.6.1",
@@ -20,7 +21,6 @@
   },
   "devDependencies": {
     "puppeteer": "^1.10.0",
-    "@tensorflow/tfjs-node": "^0.1.20",
     "micro-dev": "^3.0.0",
     "pm2": "^3.2.2",
     "prettier": "1.15.2"
