@@ -1,4 +1,4 @@
-require('dotenv').config()
+require('dotenv').config({path:`${__dirname}/.env`})
 const path = require('path')
 const jwt = require('jwt-simple')
 const secret = process.env.JWT_SECRET
@@ -14,21 +14,21 @@ const fs = require('fs')
 const readdir = promisify(fs.readdir)
 const readFile = promisify(fs.readFile)
 
-const storage = require('./lib/storage.js')
+const storage = require(`${__dirname}/lib/storage.js`)
 
 // Tensorflow
 const tf = require('@tensorflow/tfjs')
 require('@tensorflow/tfjs-node')
-const modeler = require('./lib/modeler.js')
+const modeler = require(__dirname + '/lib/modeler.js')
 
 // Config
-const config = require('./lib/config.js')
+const config = require(__dirname + '/lib/config.js')
 
 async function get_latest_model() {
 
   // Downloads
   await storage.download('version.tag')
-  let version = await readFile('./version.tag')
+  let version = await readFile(__dirname + '/version.tag')
   await storage.download('model/' + config.tensorflow.model_name + '-' + (version - 1) + '/model.json', 'model/' + config.tensorflow.model_name + '-' + (version - 1) + '/')
   await storage.download('model/' + config.tensorflow.model_name + '-' + (version - 1) + '/weights.bin')
 

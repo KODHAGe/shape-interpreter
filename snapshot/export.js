@@ -6,7 +6,7 @@ const { promisify } = require('util')
 const readFile = promisify(fs.readFile)
 
 let puppet = async function(str, data) {
-  let version = await readFile('./version.tag')
+  let version = await readFile(__dirname + '/version.tag')
   await fs.mkdir(path.join(__dirname, 'output/', data.model + '-' + version, '/'), async (err) => {
     if (err && err.code != 'EEXIST') throw 'error'
 
