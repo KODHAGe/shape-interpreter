@@ -1,3 +1,9 @@
 FROM openwhisk/action-nodejs-v8:latest
 
-RUN npm install @tensorflow/tfjs @tensorflow/tfjs-node
+COPY package.json package.json 
+
+RUN npm install
+
+COPY . .
+
+CMD ["npm","start"]
