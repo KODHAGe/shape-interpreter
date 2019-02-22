@@ -1,5 +1,4 @@
 .DS_Store
-model
 node_modules
 credentials.json
 .env
