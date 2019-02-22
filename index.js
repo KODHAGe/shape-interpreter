@@ -42,7 +42,9 @@ async function get_latest_model() {
       b = fs.statSync(b).ctime
       return a - b
     })
-    files.splice(files.indexOf('.DS_Store'), 1);
+    if(files.indexOf('.DS_Store') > - 1 ) {
+      files.splice(files.indexOf('.DS_Store'), 1);
+    }
     let latest = files[files.length - 1]
     console.log(latest)
     return latest
