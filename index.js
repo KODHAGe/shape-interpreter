@@ -98,7 +98,7 @@ async function make_prediction (req, res) {
 
     let latest = await get_latest_model()
     const model = await tf.loadModel('file://model/' + latest + '/model.json')
-    let prediction = await model.predictOnBatch(tf.tensor2d(array, [1,9]))
+    let prediction = await model.predict(tf.tensor2d(array, [1,9]))
     let values = prediction.dataSync()
     let order = modeler.config.firestore.sort_order
     let predictionResultObject = {'shapes': {}}
