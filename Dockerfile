@@ -1,4 +1,4 @@
-FROM openwhisk/action-nodejs-v8:latest
+FROM openwhisk/action-nodejs-v10:latest
 
 COPY package.json package.json 
 

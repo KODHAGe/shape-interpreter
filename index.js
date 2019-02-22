@@ -1,4 +1,3 @@
-require('dotenv').config({path:`${__dirname}/.env`})
 const path = require('path')
 const jwt = require('jwt-simple')
 const secret = process.env.JWT_SECRET
@@ -25,7 +24,6 @@ const modeler = require(__dirname + '/lib/modeler.js')
 const config = require(__dirname + '/lib/config.js')
 
 async function get_latest_model() {
-
   // Downloads
   await storage.download('version.tag')
   let version = await readFile(__dirname + '/version.tag')
